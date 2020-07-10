@@ -202,6 +202,7 @@ def ap_per_class(tp, conf, pred_cls, target_cls):
                 result_to_save = str(conf[x]) + " " + str(precision_reshape[x]) + " " + str(recall_reshape[x]) + "\n"
                 print(result_to_save)
                 result_pr.write(result_to_save)
+            result_pr.close()
 
 
             # Plot
