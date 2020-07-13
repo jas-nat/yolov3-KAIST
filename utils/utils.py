@@ -204,7 +204,7 @@ def ap_per_class(tp, conf, pred_cls, target_cls):
                 result_pr.write(result_to_save)
             result_pr.close()
 
-
+            # print(p[ci], r[ci])
             # Plot
             # fig, ax = plt.subplots(1, 1, figsize=(5, 5))
             # ax.plot(recall, precision)
@@ -218,7 +218,6 @@ def ap_per_class(tp, conf, pred_cls, target_cls):
 
     # Compute F1 score (harmonic mean of precision and recall)
     f1 = 2 * p * r / (p + r + 1e-16)
-
     return p, r, ap, f1, unique_classes.astype('int32')
 
 
