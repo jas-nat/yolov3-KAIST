@@ -461,7 +461,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             print("ir", img_ir.shape)
             #split rgb
             b, g, r = cv2.split(img_rgb)
-            img = cv2.merge((img_ir, img_rgb)) #combine the channel
+            img = cv2.merge((img_rgb, img_ir)) #combine the channel
             print("concatenate", img.shape)
             # Letterbox
             shape = self.batch_shapes[self.batch[index]] if self.rect else self.img_size  # final letterboxed shape
@@ -541,7 +541,7 @@ def load_image_ir(self, index):
     img = self.imgs[index]
     if img is None:
         path = self.img_files_ir[index]
-        img = cv2.imread(path, 0) #reading grayscale
+        img = cv2.imread(path, cv2.IMREAD_UNCHANGED) #reading grayscale
         assert img is not None, 'Image Not Found ' + path
         h0, w0 = img.shape[:]  # orig hw #only 2 values, since grayscale
         r = self.img_size / max(h0, w0)  # resize image to img_size
