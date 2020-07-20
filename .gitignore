@@ -39,6 +39,7 @@ label_transform/*
 
 pycocotools/*
 results*.txt
+pr_curve_class*.txt
 gcp_test*.sh
 
 # MATLAB GitIgnore -----------------------------------------------------------------------------------------------------

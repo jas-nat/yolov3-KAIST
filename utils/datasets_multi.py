@@ -271,6 +271,8 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             else:
                 raise Exception('%s does not exist' % path)
             self.img_files = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
+            self.img_files_ir = [x.replace('visible', 'lwir') for x in self.img_files]
+
         except:
             raise Exception('Error loading data from %s. See %s' % (path, help_url))
 
@@ -291,6 +293,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         # Define labels
         self.label_files = [x.replace('images', 'labels').replace(os.path.splitext(x)[-1], '.txt')
                             for x in self.img_files]
+
 
         # Read image shapes (wh)
         sp = path.replace('.txt', '') + '.shapes'  # shapefile path
@@ -447,12 +450,15 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             shapes = None
 
         else:
-            # Load image
-            img, (h0, w0), (h, w) = load_image(self, index)
 
+            # Load image
+            img, (h0, w0), (h, w) = load_image_multi(self, index)
+            # img_rgb, (h0, w0), (h, w) = load_image(self, index) #rgb
+            
             # Letterbox
             shape = self.batch_shapes[self.batch[index]] if self.rect else self.img_size  # final letterboxed shape
             img, ratio, pad = letterbox(img, shape, auto=False, scaleup=self.augment)
+            # print("Image shape after letterbox:", img.shape)
             shapes = (h0, w0), ((h / h0, w / w0), pad)  # for COCO mAP rescaling
 
             # Load labels
@@ -523,6 +529,29 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             l[:, 0] = i  # add target image index for build_targets()
         return torch.stack(img, 0), torch.cat(label, 0), path, shapes
 
+def load_image_multi(self, index):
+    img = self.imgs[index]
+    if img is None:
+        path_rgb = self.img_files[index]
+        path_ir = self.img_files_ir[index]
+        
+        img_rgb = cv2.imread(path_rgb) #reading rgb
+        # print("Image RGB shape", img_rgb.shape)
+        img_ir = cv2.imread(path_ir, 0) #reading grayscale
+        # print("Image IR shape", img_ir.shape)
+
+        img = cv2.merge((img_rgb, img_ir))
+        # print("Image 4 channel", img.shape)
+        assert img is not None, 'Image Not Found ' + path
+        h0, w0 = img.shape[:2]  # orig hw #only 2 values, since grayscale
+        r = self.img_size / max(h0, w0)  # resize image to img_size
+        if r != 1:  # always resize down, only resize up if training with augmentation
+            interp = cv2.INTER_AREA if r < 1 and not self.augment else cv2.INTER_LINEAR
+            img = cv2.resize(img, (int(w0 * r), int(h0 * r)), interpolation=interp)
+            print(f"Image after resize {img.shape}")
+        return img, (h0, w0), img.shape[:2]  # img, hw_original, hw_resized
+    else:
+        return self.imgs[index], self.img_hw0[index], self.img_hw[index]  # img, hw_original, hw_resized
 
 def load_image(self, index):
     # loads 1 image from dataset, returns img, original hw, resized hw
@@ -569,8 +598,8 @@ def load_mosaic(self, index):
     indices = [index] + [random.randint(0, len(self.labels) - 1) for _ in range(3)]  # 3 additional image indices
     for i, index in enumerate(indices):
         # Load image
-        img, _, (h, w) = load_image(self, index)
-
+        # img, _, (h, w) = load_image(self, index)
+        img, _, (h, w) = load_image_multi(self, index) #for 4 channels 
         # place img in img4
         if i == 0:  # top left
             img4 = np.full((s * 2, s * 2, img.shape[2]), 114, dtype=np.uint8)  # base image with 4 tiles

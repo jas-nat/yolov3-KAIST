@@ -169,7 +169,7 @@ def ap_per_class(tp, conf, pred_cls, target_cls):
     s = [unique_classes.shape[0], tp.shape[1]]  # number class, number iou thresholds (i.e. 10 for mAP0.5...0.95)
     ap, p, r = np.zeros(s), np.zeros(s), np.zeros(s)
     for ci, c in enumerate(unique_classes):
-        result_pr = open(f"results_pr_curve_class{c}.txt", "w+") #create a file for saving precision, recall, and conf
+        # result_pr = open(f"pr_curve_class{c}.txt", "w+") #create a file for saving precision, recall, and conf
 
         i = pred_cls == c
         n_gt = (target_cls == c).sum()  # Number of ground truth objects
@@ -196,13 +196,13 @@ def ap_per_class(tp, conf, pred_cls, target_cls):
 
 
             #write precision, recall, and conf
-            precision_reshape = precision.reshape([precision.shape[0],]) #reshape precision to be 1D 
-            recall_reshape = recall.reshape([recall.shape[0],]) #reshapre recall to be 1D similar to conf
-            for x in range(len(precision_reshape)):
-                result_to_save = str(conf[x]) + " " + str(precision_reshape[x]) + " " + str(recall_reshape[x]) + "\n"
-                print(result_to_save)
-                result_pr.write(result_to_save)
-            result_pr.close()
+            # precision_reshape = precision.reshape([precision.shape[0],]) #reshape precision to be 1D 
+            # recall_reshape = recall.reshape([recall.shape[0],]) #reshapre recall to be 1D similar to conf
+            # for x in range(len(precision_reshape)):
+            #     result_to_save = str(conf[x]) + " " + str(precision_reshape[x]) + " " + str(recall_reshape[x]) + "\n"
+            #     print(result_to_save)
+            #     result_pr.write(result_to_save)
+            # result_pr.close()
 
             # print(p[ci], r[ci])
             # Plot
