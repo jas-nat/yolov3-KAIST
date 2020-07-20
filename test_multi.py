@@ -20,7 +20,9 @@ def test(cfg,
          augment=False,
          model=None,
          dataloader=None,
-         multi_label=True):
+         multi_label=True,
+         nchannels=4
+         ):
     # Initialize/load model and set device
     if model is None:
         is_training = False
@@ -73,7 +75,7 @@ def test(cfg,
 
     seen = 0
     model.eval()
-    _ = model(torch.zeros((1, 3, imgsz, imgsz), device=device)) if device.type != 'cpu' else None  # run once
+    _ = model(torch.zeros((1, nchannels, imgsz, imgsz), device=device)) if device.type != 'cpu' else None  # run once
     coco91class = coco80_to_coco91_class()
     s = ('%20s' + '%10s' * 6) % ('Class', 'Images', 'Targets', 'P', 'R', 'mAP@0.5', 'F1')
     p, r, f1, mp, mr, map, mf1, t0, t1 = 0., 0., 0., 0., 0., 0., 0., 0., 0.
@@ -165,12 +167,12 @@ def test(cfg,
             # Append statistics (correct, conf, pcls, tcls)
             stats.append((correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), tcls))
 
-        # Plot images
-        if batch_i < 1:
-            f = 'test_batch%g_gt.jpg' % batch_i  # filename
-            plot_images(imgs, targets, paths=paths, names=names, fname=f)  # ground truth
-            f = 'test_batch%g_pred.jpg' % batch_i
-            plot_images(imgs, output_to_target(output, width, height), paths=paths, names=names, fname=f)  # predictions
+        # Plot images #not plotting for 4 channels
+        # if batch_i < 1:
+        #     f = 'test_batch%g_gt.jpg' % batch_i  # filename
+        #     plot_images(imgs, targets, paths=paths, names=names, fname=f)  # ground truth
+        #     f = 'test_batch%g_pred.jpg' % batch_i
+        #     plot_images(imgs, output_to_target(output, width, height), paths=paths, names=names, fname=f)  # predictions
 
     # Compute statistics
     stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy

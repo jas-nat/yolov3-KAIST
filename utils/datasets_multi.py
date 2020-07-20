@@ -271,6 +271,8 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             else:
                 raise Exception('%s does not exist' % path)
             self.img_files = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
+            self.img_files_ir = [x.replace('visible', 'lwir') for x in self.img_files]
+
         except:
             raise Exception('Error loading data from %s. See %s' % (path, help_url))
 
@@ -292,11 +294,6 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         self.label_files = [x.replace('images', 'labels').replace(os.path.splitext(x)[-1], '.txt')
                             for x in self.img_files]
 
-        #Load Infrared file
-        try:
-            self.img_files_ir = [x.replace('visible', 'lwir') for x in self.img_files]
-        except:
-            raise Exception(f" {[x.replace('visible', 'lwir') for x in self.img_files]} does not exist")
 
         # Read image shapes (wh)
         sp = path.replace('.txt', '') + '.shapes'  # shapefile path
@@ -453,19 +450,17 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             shapes = None
 
         else:
-            # Load image
-            img_rgb, (h0, w0), (h, w) = load_image(self, index) #rgb
-            img_ir, (h0_ir, w0_ir), (h_ir, w_ir) = load_image_ir(self, index) #ir
 
-            print("rgb", img_rgb.shape)
-            print("ir", img_ir.shape)
-            #split rgb
-            b, g, r = cv2.split(img_rgb)
-            img = cv2.merge((img_rgb, img_ir)) #combine the channel
-            print("concatenate", img.shape)
+            # Load image
+            img, (h0, w0), (h, w) = load_image_multi(self, index)
+            print("Image shape", img.shape)
+            # img_rgb, (h0, w0), (h, w) = load_image(self, index) #rgb
+            
+            
             # Letterbox
             shape = self.batch_shapes[self.batch[index]] if self.rect else self.img_size  # final letterboxed shape
             img, ratio, pad = letterbox(img, shape, auto=False, scaleup=self.augment)
+            print("Image shape after letterbox:", img.shape)
             shapes = (h0, w0), ((h / h0, w / w0), pad)  # for COCO mAP rescaling
 
             # Load labels
@@ -536,14 +531,21 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             l[:, 0] = i  # add target image index for build_targets()
         return torch.stack(img, 0), torch.cat(label, 0), path, shapes
 
-
-def load_image_ir(self, index):
+def load_image_multi(self, index):
     img = self.imgs[index]
     if img is None:
-        path = self.img_files_ir[index]
-        img = cv2.imread(path, cv2.IMREAD_UNCHANGED) #reading grayscale
+        path_rgb = self.img_files[index]
+        path_ir = self.img_files_ir[index]
+        
+        img_rgb = cv2.imread(path_rgb) #reading rgb
+        # print("Image RGB shape", img_rgb.shape)
+        img_ir = cv2.imread(path_ir, 0) #reading grayscale
+        # print("Image IR shape", img_ir.shape)
+
+        img = cv2.merge((img_rgb, img_ir))
+        # print("Image 4 channel", img.shape)
         assert img is not None, 'Image Not Found ' + path
-        h0, w0 = img.shape[:]  # orig hw #only 2 values, since grayscale
+        h0, w0 = img.shape[:2]  # orig hw #only 2 values, since grayscale
         r = self.img_size / max(h0, w0)  # resize image to img_size
         if r != 1:  # always resize down, only resize up if training with augmentation
             interp = cv2.INTER_AREA if r < 1 and not self.augment else cv2.INTER_LINEAR
@@ -598,8 +600,8 @@ def load_mosaic(self, index):
     indices = [index] + [random.randint(0, len(self.labels) - 1) for _ in range(3)]  # 3 additional image indices
     for i, index in enumerate(indices):
         # Load image
-        img, _, (h, w) = load_image(self, index)
-
+        # img, _, (h, w) = load_image(self, index)
+        img, _, (h, w) = load_image_multi(self, index) #for 4 channels 
         # place img in img4
         if i == 0:  # top left
             img4 = np.full((s * 2, s * 2, img.shape[2]), 114, dtype=np.uint8)  # base image with 4 tiles
