@@ -236,6 +236,9 @@ def train(hyp):
     for epoch in range(start_epoch, epochs):  # epoch ------------------------------------------------------------------
         model.train()
 
+        #directory for epoch every 5 epoch
+        weight_epoch = wdir + str(epoch) + ".pt"
+
         # Update image weights (optional)
         if dataset.image_weights:
             w = model.class_weights.cpu().numpy() * (1 - maps) ** 2  # class weights
@@ -362,10 +365,15 @@ def train(hyp):
 
             # Save last, best and delete
             torch.save(chkpt, last)
+            if epoch % 5 == 0: #save every 5 epoch
+                torch.save(chkpt, weight_epoch)
             if (best_fitness == fi) and not final_epoch:
                 torch.save(chkpt, best)
             del chkpt
 
+        #Print how many times have passed every epoch
+        print('%g epochs completed in %.3f hours.\n' % (epoch - start_epoch + 1, (time.time() - t0) / 3600))
+        time.sleep(3)
         # end epoch ----------------------------------------------------------------------------------------------------
     # end training
 
