@@ -233,9 +233,9 @@ def test(cfg,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='test.py')
-    parser.add_argument('--cfg', type=str, default='cfg/yolov3-spp-1cls.cfg', help='*.cfg path')
-    parser.add_argument('--data', type=str, default='data/coco2014.data', help='*.data path')
-    parser.add_argument('--weights', type=str, default='weights/yolov3-spp-ultralytics.pt', help='weights path')
+    parser.add_argument('--cfg', type=str, default='cfg/yolov3-spp-1cls-4channel.cfg', help='*.cfg path')
+    parser.add_argument('--data', type=str, default='data/kaist/kaist_person_day_rgb.data', help='*.data path')
+    parser.add_argument('--weights', type=str, default='weights/best.pt', help='weights path')
     parser.add_argument('--batch-size', type=int, default=16, help='size of each image batch')
     parser.add_argument('--img-size', type=int, default=512, help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float, default=0.001, help='object confidence threshold')
