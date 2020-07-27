@@ -271,7 +271,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             else:
                 raise Exception('%s does not exist' % path)
             self.img_files = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
-            self.img_files_ir = [x.replace('visible', 'lwir') for x in self.img_files]
+            self.img_files_rgb = [x.replace('lwir', 'visible') for x in self.img_files]
 
         except:
             raise Exception('Error loading data from %s. See %s' % (path, help_url))
@@ -532,15 +532,15 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
 def load_image_multi(self, index):
     img = self.imgs[index]
     if img is None:
-        path_rgb = self.img_files[index]
-        path_ir = self.img_files_ir[index]
+        path_rgb = self.img_files_rgb[index]
+        path_ir = self.img_files[index]
         
         img_rgb = cv2.imread(path_rgb) #reading rgb
         # print("Image RGB shape", img_rgb.shape)
         img_ir = cv2.imread(path_ir, 0) #reading grayscale
         # print("Image IR shape", img_ir.shape)
 
-        img = cv2.merge((img_rgb, img_ir))
+        img = cv2.merge((img_rgb, img_ir)) #combine rgb + ir
         # print("Image 4 channel", img.shape)
         assert img is not None, 'Image Not Found ' + path
         h0, w0 = img.shape[:2]  # orig hw #only 2 values, since grayscale
