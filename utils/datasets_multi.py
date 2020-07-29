@@ -257,10 +257,10 @@ class LoadStreams:  # multiple IP or RTSP cameras
 
 
 class LoadImagesAndLabels(Dataset):  # for training/testing
-    def __init__(self, path, img_size=416, batch_size=16, augment=False, hyp=None, rect=False, image_weights=False,
+    def __init__(self, path_rgb, path_ir, img_size=416, batch_size=16, augment=False, hyp=None, rect=False, image_weights=False,
                  cache_images=False, single_cls=False, pad=0.0):
         try:
-            path = str(Path(path))  # os-agnostic
+            path = str(Path(path_rgb))  # os-agnostic
             parent = str(Path(path).parent) + os.sep
             if os.path.isfile(path):  # file
                 with open(path, 'r') as f:
@@ -270,11 +270,26 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                 f = glob.iglob(path + os.sep + '*.*')
             else:
                 raise Exception('%s does not exist' % path)
-            self.img_files = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
-            self.img_files_rgb = [x.replace('lwir', 'visible') for x in self.img_files]
-
+            self.img_files_rgb = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
+            # self.img_files_rgb = [x.replace('lwir', 'visible') for x in self.img_files]
         except:
             raise Exception('Error loading data from %s. See %s' % (path, help_url))
+
+        try:
+            _path_ir = str(Path(path_ir))  # os-agnostic
+            _parent = str(Path(_path_ir).parent) + os.sep
+            if os.path.isfile(path_ir):  # file
+                with open(path_ir, 'r') as f:
+                    f = f.read().splitlines()
+                    f = [x.replace('./', _parent) if x.startswith('./') else x for x in f]  # local to global path
+            elif os.path.isdir(_path_ir):  # folder
+                f = glob.iglob(_path_ir + os.sep + '*.*')
+            else:
+                raise Exception('%s does not exist' % path_ir)
+            self.img_files = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
+            # self.img_files_rgb = [x.replace('lwir', 'visible') for x in self.img_files]
+        except:
+            raise Exception('Error loading data from %s. See %s' % (_path_ir, help_url))
 
         n = len(self.img_files)
         assert n > 0, 'No images found in %s. See %s' % (path, help_url)
@@ -314,6 +329,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             ar = s[:, 1] / s[:, 0]  # aspect ratio
             irect = ar.argsort()
             self.img_files = [self.img_files[i] for i in irect]
+            self.img_files_rgb = [self.img_files[i] for i in irect]
             self.label_files = [self.label_files[i] for i in irect]
             self.shapes = s[irect]  # wh
             ar = ar[irect]
@@ -349,7 +365,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         for i, file in enumerate(pbar):
             if labels_loaded:
                 l = self.labels[i]
-                # np.savetxt(file, l, '%g')  # save *.txt from *.npy file
+                np.savetxt(file, l, '%g')  # save *.txt from *.npy file
             else:
                 try:
                     with open(file, 'r') as f:
