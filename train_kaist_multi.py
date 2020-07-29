@@ -80,8 +80,10 @@ def train(hyp):
     data_dict = parse_data_cfg(data)
     module_defs = parse_model_cfg(cfg)
     nchannels = module_defs[0]['channels']
-    train_path = data_dict['train']
-    test_path = data_dict['valid']
+    train_path_rgb = data_dict['train_rgb']
+    train_path_ir = data_dict['train_ir']
+    test_path_rgb = data_dict['valid_rgb']
+    test_path_ir = data_dict['valid_ir']
     nc = 1 if opt.single_cls else int(data_dict['classes'])  # number of classes
     hyp['cls'] *= nc / 80  # update coco-tuned hyp['cls'] to current dataset
 
@@ -186,7 +188,7 @@ def train(hyp):
         model.yolo_layers = model.module.yolo_layers  # move yolo layer indices to top level
 
     # Dataset
-    dataset = LoadImagesAndLabels(train_path, img_size, batch_size,
+    dataset = LoadImagesAndLabels(train_path_rgb, train_path_ir, img_size, batch_size,
                                   augment=True,
                                   hyp=hyp,  # augmentation hyperparameters
                                   rect=opt.rect,  # rectangular training
@@ -204,7 +206,7 @@ def train(hyp):
                                              collate_fn=dataset.collate_fn)
 
     # Testloader
-    testloader = torch.utils.data.DataLoader(LoadImagesAndLabels(test_path, imgsz_test, batch_size,
+    testloader = torch.utils.data.DataLoader(LoadImagesAndLabels(test_path_rgb, test_path_ir, imgsz_test, batch_size,
                                                                  hyp=hyp,
                                                                  rect=True,
                                                                  cache_images=opt.cache_images,
@@ -401,7 +403,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=200)  # 500200 batches at bs 16, 117263 COCO images = 273 epochs
     parser.add_argument('--batch-size', type=int, default=4)  # effective bs = batch_size * accumulate = 16 * 4 = 64
     parser.add_argument('--cfg', type=str, default='cfg/yolov3-spp-1cls-4channel.cfg', help='*.cfg path')
-    parser.add_argument('--data', type=str, default='data/kaist/kaist_person_night_ir.data', help='*.data path')
+    parser.add_argument('--data', type=str, default='data/kaist/kaist_person_day_multi.data', help='*.data path')
     parser.add_argument('--multi-scale', action='store_true', help='adjust (67%% - 150%%) img_size every 10 batches')
     parser.add_argument('--img-size', nargs='+', type=int, default=[320, 640], help='[min_train, max-train, test]')
     parser.add_argument('--rect', action='store_true', help='rectangular training')
