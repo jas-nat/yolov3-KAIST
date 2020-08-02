@@ -270,7 +270,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                 f = glob.iglob(path + os.sep + '*.*')
             else:
                 raise Exception('%s does not exist' % path)
-            self.img_files_rgb = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
+            self.img_files = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
             # self.img_files_rgb = [x.replace('lwir', 'visible') for x in self.img_files]
         except:
             raise Exception('Error loading data from %s. See %s' % (path, help_url))
@@ -286,7 +286,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                 f = glob.iglob(_path_ir + os.sep + '*.*')
             else:
                 raise Exception('%s does not exist' % path_ir)
-            self.img_files = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
+            self.img_files_ir = [x.replace('/', os.sep) for x in f if os.path.splitext(x)[-1].lower() in img_formats]
             # self.img_files_rgb = [x.replace('lwir', 'visible') for x in self.img_files]
         except:
             raise Exception('Error loading data from %s. See %s' % (_path_ir, help_url))
@@ -329,7 +329,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             ar = s[:, 1] / s[:, 0]  # aspect ratio
             irect = ar.argsort()
             self.img_files = [self.img_files[i] for i in irect]
-            self.img_files_rgb = [self.img_files[i] for i in irect]
+            self.img_files_ir = [self.img_files_ir[i] for i in irect]
             self.label_files = [self.label_files[i] for i in irect]
             self.shapes = s[irect]  # wh
             ar = ar[irect]
@@ -548,8 +548,8 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
 def load_image_multi(self, index):
     img = self.imgs[index]
     if img is None:
-        path_rgb = self.img_files_rgb[index]
-        path_ir = self.img_files[index]
+        path_rgb = self.img_files[index]
+        path_ir = self.img_files_ir[index]
         
         img_rgb = cv2.imread(path_rgb) #reading rgb
         # print("Image RGB shape", img_rgb.shape)
