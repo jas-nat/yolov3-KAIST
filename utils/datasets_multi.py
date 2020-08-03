@@ -1,3 +1,5 @@
+#loading grayscale images modified from https://github.com/pieterbl86/yolov3/commit/18789e8e1d2c24e0cfb4b2f638fc3e66048d954e
+
 import glob
 import math
 import os
@@ -257,7 +259,7 @@ class LoadStreams:  # multiple IP or RTSP cameras
 
 
 class LoadImagesAndLabels(Dataset):  # for training/testing
-    def __init__(self, path_rgb, path_ir, img_size=416, batch_size=16, augment=False, hyp=None, rect=False, image_weights=False,
+    def __init__(self, path_rgb, path_ir, nchannel=3, img_size=416, batch_size=16, augment=False, hyp=None, rect=False, image_weights=False,
                  cache_images=False, single_cls=False, pad=0.0):
         try:
             path = str(Path(path_rgb))  # os-agnostic
@@ -298,6 +300,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
 
         self.n = n  # number of images
         self.batch = bi  # batch index of image
+        self.nchannel = nchannel
         self.img_size = img_size
         self.augment = augment
         self.hyp = hyp
@@ -462,14 +465,16 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         hyp = self.hyp
         if self.mosaic:
             # Load mosaic
-            img, labels = load_mosaic(self, index)
+            img, labels = load_mosaic(self, index, self.nchannel)
             shapes = None
 
         else:
-
             # Load image
-            img, (h0, w0), (h, w) = load_image_multi(self, index)
-            # img_rgb, (h0, w0), (h, w) = load_image(self, index) #rgb
+            if self.nchannel == 4:
+                img, (h0, w0), (h, w) = load_image_multi(self, index)
+            else:
+                img, (h0, w0), (h, w) = load_image(self, index, self.nchannel) #RGB or IR
+
             
             # Letterbox
             shape = self.batch_shapes[self.batch[index]] if self.rect else self.img_size  # final letterboxed shape
@@ -498,7 +503,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                                             shear=hyp['shear'])
 
             # Augment colorspace
-            augment_hsv(img, hgain=hyp['hsv_h'], sgain=hyp['hsv_s'], vgain=hyp['hsv_v'])
+            # augment_hsv(img, hgain=hyp['hsv_h'], sgain=hyp['hsv_s'], vgain=hyp['hsv_v'])
 
             # Apply cutouts
             # if random.random() < 0.9:
@@ -533,10 +538,13 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             labels_out[:, 1:] = torch.from_numpy(labels)
 
         # Convert
+        if img.ndim == 2:
+            img = np.expand_dims(img, axis=2) #grayscale add another dimension for channel
+
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
         img = np.ascontiguousarray(img)
 
-        return torch.from_numpy(img), labels_out, self.img_files[index], shapes
+        return torch.from_numpy(img.copy()), labels_out, self.img_files[index], shapes
 
     @staticmethod
     def collate_fn(batch):
@@ -569,13 +577,20 @@ def load_image_multi(self, index):
     else:
         return self.imgs[index], self.img_hw0[index], self.img_hw[index]  # img, hw_original, hw_resized
 
-def load_image(self, index):
+def load_image(self, index, nchannel=3):
     # loads 1 image from dataset, returns img, original hw, resized hw
+    # 3 channels or 1 channel
     img = self.imgs[index]
     if img is None:  # not cached
-        path = self.img_files[index]
-        img = cv2.imread(path)  # BGR
+        #checking channel
+        if nchannel == 1:
+            path = self.img_files_ir[index]
+            img = np.expand_dims(cv2.imread(path, 0), axis=2) # 1 channel (grayscale), expands the dimension as 1 channel doesn't have detail in img.shape cv2
+        else:
+            path = self.img_files[index]
+            img = cv2.imread(path) #BGR or 3 channel
         assert img is not None, 'Image Not Found ' + path
+        # print(f"img.shape[:2] {img.shape[:2]}")
         h0, w0 = img.shape[:2]  # orig hw
         r = self.img_size / max(h0, w0)  # resize image to img_size
         if r != 1:  # always resize down, only resize up if training with augmentation
@@ -605,7 +620,7 @@ def augment_hsv(img, hgain=0.5, sgain=0.5, vgain=0.5):
     #         img[:, :, i] = cv2.equalizeHist(img[:, :, i])
 
 
-def load_mosaic(self, index):
+def load_mosaic(self, index, nchannel):
     # loads images in a mosaic
 
     labels4 = []
@@ -615,7 +630,10 @@ def load_mosaic(self, index):
     for i, index in enumerate(indices):
         # Load image
         # img, _, (h, w) = load_image(self, index)
-        img, _, (h, w) = load_image_multi(self, index) #for 4 channels 
+        if nchannel == 4:
+            img, _, (h, w) = load_image_multi(self, index) #for 4 channels
+        else:
+            img, _, (h, w) = load_image(self, index, nchannel) #for 3 or 1 channel
         # place img in img4
         if i == 0:  # top left
             img4 = np.full((s * 2, s * 2, img.shape[2]), 114, dtype=np.uint8)  # base image with 4 tiles
