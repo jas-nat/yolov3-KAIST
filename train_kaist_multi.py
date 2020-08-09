@@ -333,7 +333,6 @@ def train(hyp):
                                       single_cls=opt.single_cls,
                                       dataloader=testloader,
                                       multi_label=ni > n_burn,
-                                      nchannels=nchannels
                                       )
 
         # Write

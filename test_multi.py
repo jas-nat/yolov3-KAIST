@@ -21,7 +21,6 @@ def test(cfg,
          model=None,
          dataloader=None,
          multi_label=True,
-         nchannels=4
          ):
     # Initialize/load model and set device
     if model is None:
@@ -54,8 +53,11 @@ def test(cfg,
         device = next(model.parameters()).device  # get model device
         verbose = False
 
+
     # Configure run
     data = parse_data_cfg(data)
+    module_defs = parse_model_cfg(cfg)
+    nchannels = module_defs[0]['channels'] #parsing channel from cfg
     nc = 1 if single_cls else int(data['classes'])  # number of classes
     path_rgb = data['valid_rgb']  # path to test images
     path_ir = data['valid_ir']
