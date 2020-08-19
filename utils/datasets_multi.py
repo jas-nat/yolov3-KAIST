@@ -47,18 +47,30 @@ class LoadImages:  # for inference
     def __init__(self, path, nchannel, img_size=416):
         path = str(Path(path))  # os-agnostic
         files = []
+        RGB_path = path + "/RGB/"
+        IR_path = path + "/IR/"
         if os.path.isdir(path):
-            files = sorted(glob.glob(os.path.join(path, '*.*')))
+            # files = sorted(glob.glob(os.path.join(path, '*.*')))
+            RGB_file = sorted(glob.glob(os.path.join(RGB_path, '*.*')))
+            IR_file = sorted(glob.glob(os.path.join(IR_path, '*.png*')))
         elif os.path.isfile(path):
             files = [path]
 
-        images = [x for x in files if os.path.splitext(x)[-1].lower() in img_formats]
         videos = [x for x in files if os.path.splitext(x)[-1].lower() in vid_formats]
-        nI, nV = len(images), len(videos)
+        nV = len(videos)
+        if nchannel == 4:
+            images_RGB = [x for x in RGB_file if os.path.splitext(x)[-1].lower() in img_formats]
+            images_IR = [x for x in IR_file if os.path.splitext(x)[-1].lower() in img_formats]
+            nI = len(images_RGB)  # a pair, so not counting 2 different images, assuming no videos
+            self.img_RGB = images_RGB
+            self.img_IR = images_IR
+        else:
+            images = [x for x in files if os.path.splitext(x)[-1].lower() in img_formats]
+            nI = len(images)
+            self.files = images + videos
 
         self.nchannel = nchannel
         self.img_size = img_size
-        self.files = images + videos
         self.nF = nI + nV  # number of files
         self.video_flag = [False] * nI + [True] * nV
         self.mode = 'images'
@@ -76,7 +88,14 @@ class LoadImages:  # for inference
     def __next__(self):
         if self.count == self.nF:
             raise StopIteration
-        path = self.files[self.count]
+
+        if self.nchannel == 4:
+            path_RGB = self.img_RGB[self.count]
+            path_IR = self.img_IR[self.count]
+            # print("path inside", path_RGB)
+            # print("path inside", path_IR)
+        else:
+            path = self.files[self.count]
 
         if self.video_flag[self.count]:
             # Read video
@@ -98,26 +117,39 @@ class LoadImages:  # for inference
         else:
             # Read image
             self.count += 1
-            if self.nchannel != 3:
-                img0 = cv2.imread(path, 0)  # grayscale or 4 channel turns to grayscale
+            if self.nchannel == 1:
+                img0 = cv2.imread(path, 0)  # grayscale 
+            elif self.nchannel == 4:
+                img_rgb = cv2.imread(path_RGB)
+                img_ir = cv2.imread(path_IR, 0)
+
+                img0 = cv2.merge((img_rgb, img_ir)) #merge the file for 4 channel
             else:
                 img0 = cv2.imread(path) # BGR / 3 channel
-            assert img0 is not None, 'Image Not Found ' + path
-            print('image %g/%g %s: ' % (self.count, self.nF, path), end='')
+
+            if self.nchannel == 4:
+                assert img0 is not None, 'Image Not Found ' + path_RGB
+                print('image %g/%g %s: ' % (self.count, self.nF, path_RGB), end='')
+
+                assert img0 is not None, 'Image Not Found ' + path_IR
+                print('image %g/%g %s: ' % (self.count, self.nF, path_IR), end='')
+            else:
+                assert img0 is not None, 'Image Not Found ' + path
+                print('image %g/%g %s: ' % (self.count, self.nF, path), end='')               
 
         # Padded resize
         img = letterbox(img0, new_shape=self.img_size)[0]
 
-        # Convert
-        # Convert
+        # extend 1 channel details to the shape
         if img.ndim == 2:
             img = np.expand_dims(img, axis=2) #grayscale add another dimension for channel
 
+        # Convert
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
         img = np.ascontiguousarray(img)
 
         # cv2.imwrite(path + '.letterbox.jpg', 255 * img.transpose((1, 2, 0))[:, :, ::-1])  # save letterbox image
-        return path, img, img0, self.cap
+        return path_RGB, path_IR, img, img0, self.cap
 
     def new_video(self, path):
         self.frame = 0

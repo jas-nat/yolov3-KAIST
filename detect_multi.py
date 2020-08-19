@@ -84,7 +84,7 @@ def detect(cfg, save_img=False):
     t0 = time.time()
     img = torch.zeros((1, nchannels, imgsz, imgsz), device=device)  # init img
     _ = model(img.half() if half else img.float()) if device.type != 'cpu' else None  # run once
-    for path, img, im0s, vid_cap in dataset:
+    for path_rgb, path_ir, img, im0s, vid_cap in dataset:
         img = torch.from_numpy(img.copy()).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
@@ -113,9 +113,17 @@ def detect(cfg, save_img=False):
             if webcam:  # batch_size >= 1
                 p, s, im0 = path[i], '%g: ' % i, im0s[i].copy()
             else:
-                p, s, im0 = path, '', im0s
-
-            save_path = str(Path(out) / Path(p).name)
+            	s = ''
+            	im0 = im0s
+            	if nchannels == 4:
+            		p_rgb = path_rgb
+            		p_ir = path_ir
+            		save_path_rgb = str(Path(out) / Path(p_rgb).name)
+            		save_path_ir = str(Path(out) / Path(p_ir).name)
+            	else:
+                	p = ''
+                	save_path = str(Path(out) / Path(p).name)
+        
             s += '%gx%g ' % img.shape[2:]  # print string
             gn = torch.tensor(im0.shape)[[1, 0, 1, 0]]  #  normalization gain whwh
             if det is not None and len(det):
@@ -150,7 +158,15 @@ def detect(cfg, save_img=False):
             # Save results (image with detections)
             if save_img:
                 if dataset.mode == 'images':
-                    cv2.imwrite(save_path, im0)
+                	if nchannels == 4:
+                		r, g, b, img_ir = cv2.split(im0)
+                		img_rgb = cv2.merge((r, g, b))
+                		
+                		#save image for each
+                		cv2.imwrite(save_path_rgb+"_rgb", img_rgb)
+                		cv2.imwrite(save_path_ir+"_ir", img_ir)
+                	else:
+	                    cv2.imwrite(save_path, im0)
                 else:
                     if vid_path != save_path:  # new video
                         vid_path = save_path
@@ -173,10 +189,10 @@ def detect(cfg, save_img=False):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cfg', type=str, default='cfg/yolov3-spp-1cls.cfg', help='*.cfg path')
+    parser.add_argument('--cfg', type=str, default='cfg/yolov3-spp-1cls-4channel.cfg', help='*.cfg path')
     parser.add_argument('--names', type=str, default='data/kaist/kaist_person.names', help='*.names path')
     parser.add_argument('--weights', type=str, default='weights/yolov3-spp-ultralytics.pt', help='weights path')
-    parser.add_argument('--source', type=str, default='data/samples', help='source')  # input file/folder, 0 for webcam
+    parser.add_argument('--source', type=str, default='data/samples/day', help='source')  # input file/folder, 0 for webcam
     parser.add_argument('--output', type=str, default='output', help='output folder')  # output folder
     parser.add_argument('--img-size', type=int, default=512, help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float, default=0.3, help='object confidence threshold')
