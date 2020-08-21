@@ -50,9 +50,11 @@ class LoadImages:  # for inference
         RGB_path = path + "/RGB/"
         IR_path = path + "/IR/"
         if os.path.isdir(path):
-            # files = sorted(glob.glob(os.path.join(path, '*.*')))
-            RGB_file = sorted(glob.glob(os.path.join(RGB_path, '*.*')))
-            IR_file = sorted(glob.glob(os.path.join(IR_path, '*.png*')))
+            if nchannel == 4:
+                RGB_file = sorted(glob.glob(os.path.join(RGB_path, '*.*')))
+                IR_file = sorted(glob.glob(os.path.join(IR_path, '*.png*')))
+            else:
+                files = sorted(glob.glob(os.path.join(path, '*.*')))
         elif os.path.isfile(path):
             files = [path]
 
