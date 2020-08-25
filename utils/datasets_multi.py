@@ -142,10 +142,6 @@ class LoadImages:  # for inference
         # Padded resize
         img = letterbox(img0, new_shape=self.img_size)[0]
 
-        # extend 1 channel details to the shape
-        if img.ndim == 2:
-            img = np.expand_dims(img, axis=2) #grayscale add another dimension for channel
-
         # Convert
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
         img = np.ascontiguousarray(img)

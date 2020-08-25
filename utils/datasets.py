@@ -42,7 +42,7 @@ def exif_size(img):
 
 
 class LoadImages:  # for inference
-    def __init__(self, path, img_size=416):
+    def __init__(self, path, nchannels, img_size=416):
         path = str(Path(path))  # os-agnostic
         files = []
         if os.path.isdir(path):
@@ -54,6 +54,7 @@ class LoadImages:  # for inference
         videos = [x for x in files if os.path.splitext(x)[-1].lower() in vid_formats]
         nI, nV = len(images), len(videos)
 
+        self.nchannels = nchannels
         self.img_size = img_size
         self.files = images + videos
         self.nF = nI + nV  # number of files
@@ -95,12 +96,19 @@ class LoadImages:  # for inference
         else:
             # Read image
             self.count += 1
-            img0 = cv2.imread(path)  # BGR
+            if self.nchannels == 1:
+                img0 = cv2.imread(path, 0) # grayscale
+            else:
+                img0 = cv2.imread(path)  # BGR
             assert img0 is not None, 'Image Not Found ' + path
             print('image %g/%g %s: ' % (self.count, self.nF, path), end='')
 
         # Padded resize
         img = letterbox(img0, new_shape=self.img_size)[0]
+
+             # extend 1 channel details to the shape
+        if img.ndim == 2:
+            img = np.expand_dims(img, axis=2) #grayscale add another dimension for channel
 
         # Convert
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
