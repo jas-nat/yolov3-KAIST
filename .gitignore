@@ -27,7 +27,8 @@ storage.googleapis.com
 runs/*
 data/*
 output/*
-label_transform/*
+label_transform/ped_counter.txt
+label_transform/kaist_person.names
 !data/samples/zidane.jpg
 !data/samples/bus.jpg
 !data/coco.names
