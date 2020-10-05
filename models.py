@@ -92,7 +92,7 @@ def create_modules(module_defs, img_size, cfg):
 
         elif mdef['type'] == 'yolo':
             yolo_index += 1
-            stride = [32, 16, 8]  # P5, P4, P3 strides
+            stride = [32, 16, 8, 4]  # P5, P4, P3 strides
             if any(x in cfg for x in ['panet', 'yolov4', 'cd53']):  # stride order reversed
                 stride = list(reversed(stride))
             layers = mdef['from'] if 'from' in mdef else []
@@ -102,7 +102,6 @@ def create_modules(module_defs, img_size, cfg):
                                 yolo_index=yolo_index,  # 0, 1, 2...
                                 layers=layers,  # output layers
                                 stride=stride[yolo_index])
-
             # Initialize preceding Conv2d() bias (https://arxiv.org/pdf/1708.02002.pdf section 3.3)
             try:
                 j = layers[yolo_index] if 'from' in mdef else -1
