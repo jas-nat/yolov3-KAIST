@@ -92,7 +92,7 @@ def create_modules(module_defs, img_size, cfg):
 
         elif mdef['type'] == 'yolo':
             yolo_index += 1
-            stride = [32,16,8,4,2]  # P5, P4, P3, P2, P1 strides
+            stride = [64,32,16,8,4]  # P5, P4, P3, P2, P1 strides
             if any(x in cfg for x in ['panet', 'yolov4', 'cd53']):  # stride order reversed
                 stride = list(reversed(stride))
             layers = mdef['from'] if 'from' in mdef else []
@@ -218,7 +218,7 @@ class YOLOLayer(nn.Module):
 class Darknet(nn.Module):
     # YOLOv3 object detection model
 
-    def __init__(self, cfg, img_size=(416, 416), verbose=False):
+    def __init__(self, cfg, img_size=(640, 640), verbose=False):
         super(Darknet, self).__init__()
 
         self.module_defs = parse_model_cfg(cfg)
