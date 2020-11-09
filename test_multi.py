@@ -25,8 +25,16 @@ def test(cfg,
     # Initialize/load model and set device
     if model is None:
         is_training = False
-        device = torch_utils.select_device(opt.device, batch_size=batch_size)
-        verbose = opt.task == 'test'
+
+        #use these 3 lines for 5 layer-small
+        no_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        device = torch_utils.select_device(no_device, batch_size=batch_size)
+        verbose = 'test'
+
+        #use this for 3 and 4 YOLO layer
+        # device = torch_utils.select_device(opt.device, batch_size=batch_size)
+        # verbose = opt.task == 'test'
+        
 
         # Remove previous
         for f in glob.glob('test_batch*.jpg'):
@@ -34,7 +42,7 @@ def test(cfg,
 
         # Initialize model
         model = Darknet(cfg, imgsz)
-
+        
         # Load weights
         attempt_download(weights)
         if weights.endswith('.pt'):  # pytorch format
@@ -79,6 +87,7 @@ def test(cfg,
     seen = 0
     model.eval()
     _ = model(torch.zeros((1, nchannels, imgsz, imgsz), device=device)) if device.type != 'cpu' else None  # run once
+
     coco91class = coco80_to_coco91_class()
     s = ('%20s' + '%10s' * 6) % ('Class', 'Images', 'Targets', 'P', 'R', 'mAP@0.5', 'F1')
     p, r, f1, mp, mr, map, mf1, t0, t1 = 0., 0., 0., 0., 0., 0., 0., 0., 0.
