@@ -48,7 +48,7 @@ class LoadImages:  # for inference
         path = str(Path(path))  # os-agnostic
         files = []
         RGB_path = path + "/RGB/"
-        IR_path = path + "/IR/"
+        IR_path = path + "/thermal/"
         if os.path.isdir(path):
             if nchannel == 4:
                 RGB_file = sorted(glob.glob(os.path.join(RGB_path, '*.*')))
