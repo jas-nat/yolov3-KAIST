@@ -7,7 +7,7 @@ import statistics
 import matplotlib.pyplot as plt
 #comment for what kind of training
 flag = 'day' 
-# flag = 'night' #uncomment this if you want train for night
+flag = 'night' #uncomment this if you want train for night
 
 #set your data_set absolute path
 #set the path for training and test
@@ -51,7 +51,7 @@ kaist_labels_folder = os.listdir(kaist_label_path)
 # print(kaist_labels)
 
 #for calculating pedestrians scale
-pedestrian_counter_file = open('ped_counter.txt', 'w+')
+# pedestrian_counter_file = open('ped_counter.txt', 'w+')
 ped_width = []
 ped_height = []
 
@@ -64,42 +64,43 @@ for phase in ['train','test']: #train_set, test_set
         allset = test_set 
     #     f = open('{2}val_{0}.txt'.format(flag, phase, kaist_list_tosave_path),'w') #create list of images for training
     kaist_img_path_phase = kaist_img_path + phase + '/' 
+    set_counter = 0
     for set_ in allset: #set0x
         kaist_img_path_set = kaist_img_path_phase + set_
         print(kaist_img_path_set) 
         
         #counter for each scenario
-        set_counter = 0
+        # set_counter = 0
 
         all_V = os.listdir(kaist_img_path_set)
         all_V.sort()
 
         for V00_ in all_V:
             #all train images but 20% from test 
-            if set_ == 'set06' and set_counter == 901: #all = 1161, person only = 901
-                print('{0} has reached {1}'.format(set_,set_counter))
-                time.sleep(1)
-                break
-            elif set_ == 'set07' and set_counter == 514:
-                print('{0} has reached {1}'.format(set_,set_counter))
-                time.sleep(1)
-                break
-            elif set_ == 'set08' and set_counter == 942:
-                print('{0} has reached {1}'.format(set_,set_counter))
-                time.sleep(1)
-                break
-            elif set_ == 'set09' and set_counter == 545:
-                print('{0} has reached {1}'.format(set_,set_counter))
-                time.sleep(1)
-                break
-            elif set_ == 'set10' and set_counter == 561:
-                print('{0} has reached {1}'.format(set_,set_counter))
-                time.sleep(1)
-                break
-            elif set_ == 'set11' and set_counter == 324:
-                print('{0} has reached {1}'.format(set_,set_counter))
-                time.sleep(1)
-                break
+            # if set_ == 'set06' and set_counter == 901: #all = 1161, person only = 901
+            #     print('{0} has reached {1}'.format(set_,set_counter))
+            #     time.sleep(1)
+            #     break
+            # elif set_ == 'set07' and set_counter == 514:
+            #     print('{0} has reached {1}'.format(set_,set_counter))
+            #     time.sleep(1)
+            #     break
+            # elif set_ == 'set08' and set_counter == 942:
+            #     print('{0} has reached {1}'.format(set_,set_counter))
+            #     time.sleep(1)
+            #     break
+            # elif set_ == 'set09' and set_counter == 545:
+            #     print('{0} has reached {1}'.format(set_,set_counter))
+            #     time.sleep(1)
+            #     break
+            # elif set_ == 'set10' and set_counter == 561:
+            #     print('{0} has reached {1}'.format(set_,set_counter))
+            #     time.sleep(1)
+            #     break
+            # elif set_ == 'set11' and set_counter == 324:
+            #     print('{0} has reached {1}'.format(set_,set_counter))
+            #     time.sleep(1)
+            #     break
 
             # ex kaist_img_path = /home/dlsj/Documents/KAIST_Dataset/train/set02/
             kaist_images = os.listdir(kaist_img_path_set + '/' + str(V00_) + '/visible/') #rgb images
@@ -111,30 +112,30 @@ for phase in ['train','test']: #train_set, test_set
             #list of images
             for indexi, img in enumerate(kaist_images): #img is the name file, indexi is the iter
                 #all train images but 20% from test 
-                if set_ == 'set06' and set_counter == 901:
-                    print('{0} has reached {1}'.format(set_,set_counter))
-                    time.sleep(1)
-                    break
-                elif set_ == 'set07' and set_counter == 514:
-                    print('{0} has reached {1}'.format(set_,set_counter))
-                    time.sleep(1)
-                    break
-                elif set_ == 'set08' and set_counter == 942:
-                    print('{0} has reached {1}'.format(set_,set_counter))
-                    time.sleep(1)
-                    break
-                elif set_ == 'set09' and set_counter == 545:
-                    print('{0} has reached {1}'.format(set_,set_counter))
-                    time.sleep(1)
-                    break
-                elif set_ == 'set10' and set_counter == 561:
-                    print('{0} has reached {1}'.format(set_,set_counter))
-                    time.sleep(1)
-                    break
-                elif set_ == 'set11' and set_counter == 324:
-                    print('{0} has reached {1}'.format(set_,set_counter))
-                    time.sleep(1)
-                    break
+                # if set_ == 'set06' and set_counter == 901:
+                #     print('{0} has reached {1}'.format(set_,set_counter))
+                #     time.sleep(1)
+                #     break
+                # elif set_ == 'set07' and set_counter == 514:
+                #     print('{0} has reached {1}'.format(set_,set_counter))
+                #     time.sleep(1)
+                #     break
+                # elif set_ == 'set08' and set_counter == 942:
+                #     print('{0} has reached {1}'.format(set_,set_counter))
+                #     time.sleep(1)
+                #     break
+                # elif set_ == 'set09' and set_counter == 545:
+                #     print('{0} has reached {1}'.format(set_,set_counter))
+                #     time.sleep(1)
+                #     break
+                # elif set_ == 'set10' and set_counter == 561:
+                #     print('{0} has reached {1}'.format(set_,set_counter))
+                #     time.sleep(1)
+                #     break
+                # elif set_ == 'set11' and set_counter == 324:
+                #     print('{0} has reached {1}'.format(set_,set_counter))
+                #     time.sleep(1)
+                #     break
 
                 filename = str(img).split('.png')
                 # print(filename)
@@ -179,14 +180,15 @@ for phase in ['train','test']: #train_set, test_set
                             class_str = data[0] #class label
                             if class_str == 'person?' or class_str == 'person': 
                                 class_str = 'person'
+                                set_counter+=1
                             else: #uncomment this for excluding people and cyclist
                                 continue #go to next line
                             #create a txt file for annotation
                             if os.path.exists(kaist_label_tosave):
                                 # real_label = open(kaist_label_tosave,'a') #append if it exists
                                 pass
-                            else:
-                                set_counter+=1 #add 1 more counter for 1 scenario
+                            #else:
+                            #    set_counter+=1 #add 1 more counter for 1 scenario
                                 # real_label = open(kaist_label_tosave, 'w') #make a new file if it doesn't exists
                                 #save the image set if there is an object
                                 # print("writing to {2}{1}_{0}.txt".format(flag, phase, kaist_list_tosave_path))
@@ -216,45 +218,48 @@ for phase in ['train','test']: #train_set, test_set
                             # line_to_write = str(kaist_names_num[class_str]) + ' ' + str(bbox_center_x)+ ' ' + str(bbox_center_y)+ ' ' + str(bbox_width)+ ' ' + str(bbox_height) +'\n' #1 line of all texts
                             # print('Writing {0} to {1}'.format(line_to_write,str(real_label)))
 
+
                             # real_label.write(line_to_write) #write to the new file
+                            #for calculating pedestrians
                             width_height_to_write = str(width) + str(height) + '\n'
-                            print(f'Writing width {width} height {height} to txt {kaist_label_tosave}')
-                            pedestrian_counter_file.write(width_height_to_write)
+                            # print(f'Writing width {width} height {height} to txt {kaist_label_tosave}')
+                            # pedestrian_counter_file.write(width_height_to_write)
 
                             sys.stdout.write(str(int((indexi/len(kaist_images))*100))+'% '+'*******************->' "\r" )
                             sys.stdout.flush()
                             # real_label.close()
-                            
+    print(f'Phase {phase} Counter {set_counter} situation {flag}')
+    time.sleep(5)            
 
 # f.close()
-pedestrian_counter_file.close()
+# pedestrian_counter_file.close()
 kaist_names.close()
 
 #finding the average, min, max , mode, median
-avg_ped_width = np.mean(ped_width)
-avg_ped_height = np.mean(ped_height)
-mod_ped_width = statistics.mode(ped_width)
-mod_ped_height = statistics.mode(ped_height)
-med_ped_width = np.median(ped_width)
-med_ped_height = np.median(ped_height)
-print(f'avg height {avg_ped_height:.2f} avg width {avg_ped_width:.2f}')
-print(f'mode height {mod_ped_height} mode width {mod_ped_width}')
-print(f'median height {med_ped_height} Median width {med_ped_width}')
+# avg_ped_width = np.mean(ped_width)
+# avg_ped_height = np.mean(ped_height)
+# mod_ped_width = statistics.mode(ped_width)
+# mod_ped_height = statistics.mode(ped_height)
+# med_ped_width = np.median(ped_width)
+# med_ped_height = np.median(ped_height)
+# print(f'avg height {avg_ped_height:.2f} avg width {avg_ped_width:.2f}')
+# print(f'mode height {mod_ped_height} mode width {mod_ped_width}')
+# print(f'median height {med_ped_height} Median width {med_ped_width}')
 
-print(f'min height {min(ped_height)} max height {max(ped_height)}')
-print(f'min width {min(ped_width)} max width {max(ped_width)}')
+# print(f'min height {min(ped_height)} max height {max(ped_height)}')
+# print(f'min width {min(ped_width)} max width {max(ped_width)}')
 
 #draw boxplot
-fig1 = plt.figure() 
-ax1 = plt.subplot(2,1,1)
-ax1.set_title("Width")
-ax1.boxplot(ped_width, vert = False)
+# fig1 = plt.figure() 
+# ax1 = plt.subplot(2,1,1)
+# ax1.set_title("Width")
+# ax1.boxplot(ped_width, vert = False)
 
-ax2 = plt.subplot(2,1,2)
-ax2.set_title("Height")
-ax2.boxplot(ped_height, vert=False)
+# ax2 = plt.subplot(2,1,2)
+# ax2.set_title("Height")
+# ax2.boxplot(ped_height, vert=False)
 
-fig1.suptitle("Pedestrian Day")
-fig1.tight_layout()
-plt.show()
+# fig1.suptitle("Pedestrian Day")
+# fig1.tight_layout()
+# plt.show()
 print("Labels transform finished!")
