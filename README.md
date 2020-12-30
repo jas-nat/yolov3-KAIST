@@ -1,26 +1,5 @@
-<table style="width:100%">
-  <tr>
-    <td>
-      <img src="https://user-images.githubusercontent.com/26833433/61591130-f7beea00-abc2-11e9-9dc0-d6abcf41d713.jpg">
-    </td>
-    <td align="center">
-    <a href="https://www.ultralytics.com" target="_blank">
-    <img src="https://storage.googleapis.com/ultralytics/logo/logoname1000.png" width="160"></a>
-      <img src="https://user-images.githubusercontent.com/26833433/61591093-2b4d4480-abc2-11e9-8b46-d88eb1dabba1.jpg">
-          <a href="https://itunes.apple.com/app/id1452689527" target="_blank">
-    <img src="https://user-images.githubusercontent.com/26833433/50044365-9b22ac00-0082-11e9-862f-e77aee7aa7b0.png" width="180"></a>
-    </td>
-    <td>
-      <img src="https://user-images.githubusercontent.com/26833433/61591100-55066b80-abc2-11e9-9647-52c0e045b288.jpg">
-    </td>
-  </tr>
-</table>
-
-
 ## Introduction
-
-The https://github.com/ultralytics/yolov3 repo contains inference and training code for YOLOv3 in PyTorch. The code works on Linux, MacOS and Windows. Training is done on the COCO dataset by default: https://cocodataset.org/#home. **Credit to Joseph Redmon for YOLO:** https://pjreddie.com/darknet/yolo/.
-
+Hi! I forked repository from [ultralytics](https://github.com/ultralytics/yolov3) to work on my graduation research project on KAIST Multispectral Pedestrian Dataset. Please cite my work if you use my repository on your own project. For issues regarding the yolov3, please check the original yolo v3. I am still doing this research towards my graduation, so the code is not yet stable.
 
 ## Requirements
 
@@ -28,7 +7,6 @@ Python 3.7 or later with all `requirements.txt` dependencies installed, includin
 ```bash
 $ pip install -U -r requirements.txt
 ```
-
 
 ## Tutorials
 
@@ -180,16 +158,6 @@ To access an up-to-date working environment (with all dependencies including CUD
 ## Citation
 
 [![DOI](https://zenodo.org/badge/146165888.svg)](https://zenodo.org/badge/latestdoi/146165888)
-
-
-## About Us
-
-Ultralytics is a U.S.-based particle physics and AI startup with over 6 years of expertise supporting government, academic and business clients. We offer a wide range of vision AI services, spanning from simple expert advice up to delivery of fully customized, end-to-end production solutions, including:
-- **Cloud-based AI** systems operating on **hundreds of HD video streams in realtime.**
-- **Edge AI** integrated into custom iOS and Android apps for realtime **30 FPS video inference.**
-- **Custom data training**, hyperparameter evolution, and model exportation to any destination.
-
-For business inquiries and professional support requests please visit us at https://www.ultralytics.com. 
 
 
 ## Contact
