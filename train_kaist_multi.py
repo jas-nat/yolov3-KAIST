@@ -188,6 +188,7 @@ def train(hyp):
         model.yolo_layers = model.module.yolo_layers  # move yolo layer indices to top level
 
     # Dataset
+    print(f"channel number {nchannels}")
     dataset = LoadImagesAndLabels(train_path_rgb, train_path_ir, nchannels, img_size, batch_size,
                                   augment=True,
                                   hyp=hyp,  # augmentation hyperparameters
