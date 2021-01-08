@@ -3,6 +3,7 @@
 # https://github.com/pieterbl86/yolov3/commit/687babbb7df73706428767d41c2b58dd1b18a257 for 1 channel
 import argparse
 
+from statistics import mean
 from models import *  # set ONNX_EXPORT in models.py
 from utils.datasets_multi import *
 from utils.utils import *
@@ -81,6 +82,7 @@ def detect(cfg, save_img=False):
 
 	# Run inference
 	t0 = time.time()
+	comp_time = [] #list for all computation time
 	img = torch.zeros((1, nchannels, imgsz, imgsz), device=device)  # init img
 	_ = model(img.half() if half else img.float()) if device.type != 'cpu' else None  # run once
 	for path_rgb, path_ir, img, im0s, vid_cap in dataset:
@@ -166,6 +168,7 @@ def detect(cfg, save_img=False):
 
 			# Print time (inference + NMS)
 			print('%sDone. (%.3fs)' % (s, t2 - t1))
+			comp_time.append(t2-t1)
 
 			# Stream results
 			if view_img:
@@ -203,6 +206,7 @@ def detect(cfg, save_img=False):
 			os.system('open ' + save_path)
 
 	print('Done. (%.3fs)' % (time.time() - t0))
+	print(f'Average computation time {round(mean(comp_time), 5)} s')
 
 
 if __name__ == '__main__':
