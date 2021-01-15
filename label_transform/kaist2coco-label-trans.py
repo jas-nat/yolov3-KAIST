@@ -7,7 +7,7 @@ import statistics
 import matplotlib.pyplot as plt
 #comment for what kind of training
 flag = 'day' 
-flag = 'night' #uncomment this if you want train for night
+# flag = 'night' #uncomment this if you want train for night
 
 #set your data_set absolute path
 #set the path for training and test
@@ -186,7 +186,7 @@ for phase in ['train','test']: #train_set, test_set
                             #create a txt file for annotation
                             if os.path.exists(kaist_label_tosave):
                                 # real_label = open(kaist_label_tosave,'a') #append if it exists
-                                pass
+                                pass #if not want to create label
                             #else:
                             #    set_counter+=1 #add 1 more counter for 1 scenario
                                 # real_label = open(kaist_label_tosave, 'w') #make a new file if it doesn't exists
@@ -250,16 +250,23 @@ kaist_names.close()
 # print(f'min width {min(ped_width)} max width {max(ped_width)}')
 
 #draw boxplot
-# fig1 = plt.figure() 
-# ax1 = plt.subplot(2,1,1)
-# ax1.set_title("Width")
+fig1 = plt.figure() 
+ax1 = plt.subplot(1,2,1)
+ax1.set_title("Width")
 # ax1.boxplot(ped_width, vert = False)
+ax1.hist(ped_width, linewidth=1.2, edgecolor='black')
+ax1.set_xlabel("px")
+ax1.set_ylabel("frequency")
 
-# ax2 = plt.subplot(2,1,2)
-# ax2.set_title("Height")
+ax2 = plt.subplot(1,2,2)
+ax2.set_title("Height")
 # ax2.boxplot(ped_height, vert=False)
+ax2.hist(ped_height, linewidth=1.2, edgecolor='black')
+ax2.set_xlabel("px")
+ax2.set_ylabel("frequency")
 
-# fig1.suptitle("Pedestrian Day")
-# fig1.tight_layout()
-# plt.show()
+# fig1.suptitle("Pedestrian Night")
+fig1.tight_layout()
+plt.show()
+
 print("Labels transform finished!")
