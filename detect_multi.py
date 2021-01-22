@@ -23,6 +23,7 @@ def detect(cfg, save_img=False):
 		shutil.rmtree(out)  # delete output folder
 	os.makedirs(out)  # make new output folder
 
+
 	# Initialize model
 	model = Darknet(opt.cfg, imgsz)
 
@@ -204,6 +205,14 @@ def detect(cfg, save_img=False):
 		print('Results saved to %s' % os.getcwd() + os.sep + out)
 		if platform == 'darwin':  # MacOS
 			os.system('open ' + save_path)
+
+
+	#delete model for clearing memory
+	print("Deleting model and clear the memory")
+	del model
+	#empty memory
+	torch.cuda.empty_cache() #clear memory
+	print("memory is cleared")
 
 	print('Done. (%.3fs)' % (time.time() - t0))
 	print(f'Average computation time {round(mean(comp_time), 5)} s')

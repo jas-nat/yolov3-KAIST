@@ -242,6 +242,10 @@ def test(cfg,
         maps[c] = ap[i]
     return (mp, mr, map, mf1, *(loss.cpu() / len(dataloader)).tolist()), maps
 
+    #Clearing memory
+    del model
+    torch.cuda.empty_cache()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='test.py')

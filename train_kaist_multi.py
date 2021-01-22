@@ -188,7 +188,7 @@ def train(hyp):
         model.yolo_layers = model.module.yolo_layers  # move yolo layer indices to top level
 
     # Dataset
-    print(f"channel number {nchannels}")
+    print(f"Channel Number: {nchannels}")
     dataset = LoadImagesAndLabels(train_path_rgb, train_path_ir, nchannels, img_size, batch_size,
                                   augment=True,
                                   hyp=hyp,  # augmentation hyperparameters
@@ -397,15 +397,16 @@ def train(hyp):
         plot_results()  # save as results.png
     print('%g epochs completed in %.3f hours.\n' % (epoch - start_epoch + 1, (time.time() - t0) / 3600))
     dist.destroy_process_group() if torch.cuda.device_count() > 1 else None
+    del model
     torch.cuda.empty_cache()
     
     #validation again using best pt
-    # if final_epoch:
-    #     print("Validating the best model")
-    #     best_weight = 'weights/best.pt'
+    if final_epoch:
+        print("Validating the best model")
+        best_weight = 'weights/best.pt'
 
-    #     test.test(cfg, data, batch_size=16, weights=best_weight, imgsz=imgsz_test, dataloader=testloader)
-    #     print("Final epoch has been validated")
+        test.test(cfg, data, batch_size=16, weights=best_weight, imgsz=imgsz_test, dataloader=testloader)
+        print("Final epoch has been validated")
 
     return results
 
@@ -413,10 +414,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, default=200)  # 500200 batches at bs 16, 117263 COCO images = 273 epochs
     parser.add_argument('--batch-size', type=int, default=4)  # effective bs = batch_size * accumulate = 16 * 4 = 64
-    parser.add_argument('--cfg', type=str, default='cfg/yolov3-spp-4layer-1cls-4channel.cfg', help='*.cfg path')
-    parser.add_argument('--data', type=str, default='data/kaist/kaist_person_all_multi.data', help='*.data path')
+    parser.add_argument('--cfg', type=str, default='cfg/yolov3-spp-5layer-C-1cls-4channel.cfg', help='*.cfg path')
+    parser.add_argument('--data', type=str, default='data/kaist/kaist_person_night_multi.data', help='*.data path')
     parser.add_argument('--multi-scale', action='store_true', help='adjust (67%% - 150%%) img_size every 10 batches')
-    parser.add_argument('--img-size', nargs='+', type=int, default=[320, 640], help='[min_train, max-train, test]')
+    parser.add_argument('--img-size', nargs='+', type=int, default=[640, 640], help='[min_train, max-train, test]')
     parser.add_argument('--rect', action='store_true', help='rectangular training')
     parser.add_argument('--resume', action='store_true', help='resume training from last.pt')
     parser.add_argument('--nosave', action='store_true', help='only save final checkpoint')
