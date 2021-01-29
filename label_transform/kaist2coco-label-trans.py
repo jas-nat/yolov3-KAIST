@@ -7,7 +7,7 @@ import statistics
 import matplotlib.pyplot as plt
 #comment for what kind of training
 flag = 'day' 
-# flag = 'night' #uncomment this if you want train for night
+flag = 'night' #uncomment this if you want train for night
 
 #set your data_set absolute path
 #set the path for training and test
@@ -255,6 +255,8 @@ ax1 = plt.subplot(1,2,1)
 ax1.set_title("Width")
 # ax1.boxplot(ped_width, vert = False)
 ax1.hist(ped_width, linewidth=1.2, edgecolor='black')
+ax1.set_ylim(0, 13000)
+ax1.set_xlim(0,300)
 ax1.set_xlabel("px")
 ax1.set_ylabel("frequency")
 
@@ -262,6 +264,8 @@ ax2 = plt.subplot(1,2,2)
 ax2.set_title("Height")
 # ax2.boxplot(ped_height, vert=False)
 ax2.hist(ped_height, linewidth=1.2, edgecolor='black')
+ax2.set_ylim(0, 13000)
+ax2.set_xlim(0,300)
 ax2.set_xlabel("px")
 ax2.set_ylabel("frequency")
 
