@@ -165,7 +165,7 @@ def detect(cfg, save_img=False):
 							# plot_one_box(xyxy, img_ir, label=label, color=[255, 255, 255])   #only plot 1 box per image 
 							# plot_one_box(xyxy, img_rgb, label=label, color=colors[int(cls)])                       
 						# else:
-						plot_one_box(xyxy, im0, label=label, color=colors[int(cls)])
+						plot_one_box(xyxy, im0, label=label, color=colors[int(cls)]) #without label, just comment the label and leave the label blank
 
 			# Print time (inference + NMS)
 			print('%sDone. (%.3fs)' % (s, t2 - t1))

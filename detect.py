@@ -4,6 +4,7 @@
 import argparse
 
 from models import *  # set ONNX_EXPORT in models.py
+from statistics import mean
 from utils.datasets import *
 from utils.utils import *
 
@@ -81,6 +82,7 @@ def detect(cfg, save_img=False):
 
 	# Run inference
 	t0 = time.time()
+	comp_time = [] #list for all computation time
 	img = torch.zeros((1, nchannels, imgsz, imgsz), device=device)  # init img
 	_ = model(img.half() if half else img.float()) if device.type != 'cpu' else None  # run once
 	for path, img, im0s, vid_cap in dataset:
@@ -161,10 +163,11 @@ def detect(cfg, save_img=False):
 							# plot_one_box(xyxy, img_ir, label=label, color=[255, 255, 255])   #only plot 1 box per image 
 							# plot_one_box(xyxy, img_rgb, label=label, color=colors[int(cls)])                       
 						# else:
-						plot_one_box(xyxy, im0, label=label, color=colors[int(cls)])
+						plot_one_box(xyxy, im0, label=label, color=colors[int(cls)]) #without label, just comment the label and leave the label
 
 			# Print time (inference + NMS)
 			print('%sDone. (%.3fs)' % (s, t2 - t1))
+			comp_time.append(t2-t1)
 
 			# Stream results
 			if view_img:
@@ -193,8 +196,15 @@ def detect(cfg, save_img=False):
 		if platform == 'darwin':  # MacOS
 			os.system('open ' + save_path)
 
-	print('Done. (%.3fs)' % (time.time() - t0))
+	#delete model for clearing memory
+	print("Deleting model and clear the memory")
+	del model
+	#empty memory
+	torch.cuda.empty_cache() #clear memory
+	print("memory is cleared")
 
+	print('Done. (%.3fs)' % (time.time() - t0))
+	print(f'Average computation time {round(mean(comp_time), 5)} s')
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
