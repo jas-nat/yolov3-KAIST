@@ -5,9 +5,10 @@ import sys
 import time
 import statistics
 import matplotlib.pyplot as plt
+import matplotlib.ticker as tkr
 #comment for what kind of training
 flag = 'day' 
-flag = 'night' #uncomment this if you want train for night
+#flag = 'night' #uncomment this if you want train for night
 
 #set your data_set absolute path
 #set the path for training and test
@@ -254,20 +255,22 @@ fig1 = plt.figure()
 ax1 = plt.subplot(1,2,1)
 ax1.set_title("Width")
 # ax1.boxplot(ped_width, vert = False)
-ax1.hist(ped_width, linewidth=1.2, edgecolor='black')
-ax1.set_ylim(0, 13000)
+ax1.hist(ped_width, linewidth=1.2, edgecolor='black', color='magenta')
+ax1.set_ylim(0, 40000)
 ax1.set_xlim(0,300)
 ax1.set_xlabel("px")
 ax1.set_ylabel("frequency")
+ax1.get_yaxis().set_major_formatter(tkr.FuncFormatter(lambda x, p: format(int(x), ',')))
 
 ax2 = plt.subplot(1,2,2)
 ax2.set_title("Height")
 # ax2.boxplot(ped_height, vert=False)
-ax2.hist(ped_height, linewidth=1.2, edgecolor='black')
-ax2.set_ylim(0, 13000)
+ax2.hist(ped_height, linewidth=1.2, edgecolor='black', color='magenta')
+ax2.set_ylim(0, 40000)
 ax2.set_xlim(0,300)
 ax2.set_xlabel("px")
 ax2.set_ylabel("frequency")
+ax2.get_yaxis().set_major_formatter(tkr.FuncFormatter(lambda x, p: format(int(x), ',')))
 
 # fig1.suptitle("Pedestrian Night")
 fig1.tight_layout()
