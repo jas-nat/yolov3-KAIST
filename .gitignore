@@ -25,7 +25,10 @@
 
 storage.googleapis.com
 runs/*
+
 data/*
+!data/kaist/
+
 output/*
 label_transform/ped_counter.txt
 label_transform/kaist_person.names

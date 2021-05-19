@@ -21,7 +21,7 @@ There is also a histogram plot to draw how many people are there in the datasets
 
 **Training configurations**
 
-Configure `.cfg` and `.data` file in `config`
+Configure `.cfg` and `.data` file in `config` (See examples)
   -channels: 4 for multispectral, 3 for RGB, and 1 for infrared only
   -location of training files and validations 
   
@@ -41,11 +41,17 @@ Some important arguments to put afterwards:
 * `--img-size` to adjust the image size
 
 ## Validation
-Run `python3 test_kaist_multi.py`. It will load `weights/best.pt`. It will also produce the confidence detection results later
+Don't forget to use the correct `.cfg` file.
+Run `python3 test_kaist_multi.py`. 
+It will load `weights/best.pt`. It will also produce the confidence detection results later
 
 ## Detection Examples
-Run `python3 detect_multi.py`
+Don't forget to use the correct `.cfg` file. The image examples
+Run `python3 detect_multi.py`. 
 As it is impossible to produce bounding box detections on 4 channels images, you can choose to output RGB-based or thermal-based images. You can modify the codes inside `detect_multi.py`
+
+## Reference Configurations
+I trained this code for 200 epochs, 4 batch size using `NVIDIA RTX 2080 Ti`. It takes around 20 hours for daytime images and about 12 hours for nighttime images. 
 
 ## Publication
 This project has been published to MDPI Journal: Sensors. Please take a look further [here](https://www.mdpi.com/1424-8220/21/7/2536). I humbly request you to cite our publication if you use this code as a reference.
